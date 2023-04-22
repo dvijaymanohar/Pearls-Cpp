@@ -1,0 +1,5 @@
+/mnt/d/vmd/clouds/OneDrive/code_base/interview/davinci_derivatives/CMakeFiles/edit_cache.dir
+/mnt/d/vmd/clouds/OneDrive/code_base/interview/davinci_derivatives/CMakeFiles/package_source.dir
+/mnt/d/vmd/clouds/OneDrive/code_base/interview/davinci_derivatives/CMakeFiles/rebuild_cache.dir
+/mnt/d/vmd/clouds/OneDrive/code_base/interview/davinci_derivatives/CMakeFiles/package.dir
+/mnt/d/vmd/clouds/OneDrive/code_base/interview/davinci_derivatives/CMakeFiles/davince.dir

@@ -1,0 +1,16 @@
+
+Google search string: design elevator system c++
+
+Bookmarks
+
+http://kargs.net/elevator.html
+https://stackoverflow.com/questions/493276/modelling-an-elevator-using-object-oriented-analysis-and-design\
+https://programmersheaven.com/discussion/434811/how-to-design-and-implement-the-elevator-simulation-in-c
+https://github.com/hannahvoelker/Elevator
+https://medium.com/geekculture/system-design-elevator-system-design-interview-question-6e8d03ce1b44
+https://codereview.stackexchange.com/questions/179645/elevator-design-interview
+https://codereview.stackexchange.com/questions/232502/elevator-design-implementation-in-c
+https://codereview.stackexchange.com/questions/5723/oop-elevator-design-evaluation?rq=1
+https://codereview.stackexchange.com/questions/104242/elevator-management-system?rq=1
+https://codereview.stackexchange.com/questions/179645/elevator-design-interview?rq=1
+

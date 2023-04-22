@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/davince.dir/main.cpp.o CMakeFiles/davince.dir/order_table.cpp.o CMakeFiles/davince.dir/order_operations.cpp.o  -o davince 

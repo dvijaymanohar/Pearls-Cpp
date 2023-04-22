@@ -1,0 +1,151 @@
+
+
+					  Copyright(c) Genexis B.V., 2018
+							      Version 1.4
+
+
+
+Program description in short
+
+ A betting game server is accepting clients on tcp sockets, letting the
+ clients pick a number within a published range, and every 15 seconds
+ randomize a winning number, and then letting the clients know if they
+ have won or not.
+
+
+
+Description of the program
+
+ The program must accept IPv4 connections on TCP port 2222 and handle up
+ to BETSERVER_NUM_CLIENTS clients. The code must allow for this define to 
+ range from 1 to 64500.
+
+ A unique client id must be generated upon receipt of a BETSERVER_OPEN
+ message, this client id must never collide with another connected client.
+
+ If the maximum number of simultaenous clients is reached the server
+ must tear down the connection, else it must respond to the BETSERVER_OPEN
+ message with a BETSERVER_ACCEPT message with the allocated client id and
+ the allowed betting number range (bounds inclusive).
+ When the client has sent a BETSERVER_BET message, which must follow no
+ other message than BETSERVER_ACCEPT and have a betting number within
+ the published range, the server is to include that client in the next
+ betting run.  The client must only send the BETSERVER_BET message once,
+ any protocol breaches must immediately result in a connection teardown
+ by the server.
+
+ A betting run must be performed every 15 seconds but only if there are
+ clients connected.
+
+ The betting run must generate a random number within the published
+ betting number range and send out the winning number to all clients
+ with the BETSERVER_RESULT message, indicating for each client if they
+ won or not.  Each winner should also be printed on a seperate line to
+ stdout, syslog, or similar.  The connection to each client that betted
+ in this run must then be closed.
+
+ The program must be able to run "forever" without interaction.
+ 
+ The following defines and values are to be used:
+
+ #define BETSERVER_NUM_CLIENTS  40
+ #define BETSERVER_NUM_MIN      0xe0ffff00
+ #define BETSERVER_NUM_MAX      0xe0ffffaa
+
+
+
+Protocol specification
+
+ The Betting Game Server Protocol, BETSERVER, is a binary protocol in
+ network byte order. Messages are described below.
+
+  BETSERVER common header included in all messages:
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Ver |  Len    |    Type       |        Client Id              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+  Ver (Version) is always set to 1.
+  Len (Length) is the length of the entire message in bytes, including header.
+  Type is the message type (BETSERVER_*) as described below.
+  Client Id is assigned by the server in the BETSERVER_ACCEPT message
+    and must thereafter be used in all communication between the server
+    and client. It must be set to 0 in the BETSERVER_OPEN message.
+
+
+  Message type BETSERVER_OPEN = 1
+
+   This message has no payload.
+
+   It is sent upon connect by the client and may be sent only once.
+   Client Id must be set to 0.
+
+
+  Message type BETSERVER_ACCEPT = 2
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                   Lower end of number range                   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                   Upper end of number range                   |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+  
+   This message is sent by the server in response to a BETSERVER_OPEN
+   message, the Client Id is set to a dynamically assigned and unique
+   id in the range 0..BETSERVER_NUM_CLIENTS-1
+
+   The Lower and Upper end of betting range fields are set to the
+   BETSERVER_NUM_MIN and BETSERVER_NUM_MAX defines.
+
+
+  Message type BETSERVER_BET = 3
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |                       Betting number                          |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+   This message is sent by the client in response to a BETSERVER_ACCEPT.
+
+   The Betting number is the number the client is betting on and must
+   be within the number range returned in the BETSERVER_ACCEPT message.
+   Range boundary bets are allowed.
+   If the betting number is out of range, the client is to be discarded.
+
+   
+  Message type BETSERVER_RESULT = 4
+
+    0                   1                   2                   3
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   |    Status     |                Winning number...              |
+   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+   | Win num cont. |
+   +-+-+-+-+-+-+-+-+
+
+  This message is sent by the server to all clients when a winning
+  number has been generated and is sent to all clients that have sent
+  a BETSERVER_BET message.
+
+  The Status field is set to 1 if this client had sent the winning number
+  in its BETSERVER_BET message, or 0 if it did not match.
+
+  Winning number is simply the winning number.
+
+  When this message has been delivered to the client the connection
+  must be torn down and terminated and the client forgotten.
+
+ 
+
+Environment
+
+ This program must be written in C (not C++) and be compilable with gcc /
+ Linux. Only standard operating system libraries may be used (such as -lc,
+ -lnls, etc).
+
+ Please provide build instructions or a Makefile. 
